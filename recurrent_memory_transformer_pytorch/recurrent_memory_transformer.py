@@ -25,10 +25,7 @@ def identity(t, *args, **kwargs):
     return t
 
 def default(*vals):
-    for val in vals:
-        if exists(val):
-            return val
-    return None
+    return next((val for val in vals if exists(val)), None)
 
 def eval_decorator(fn):
     def inner(self, *args, **kwargs):
@@ -69,10 +66,7 @@ def token_shift_fn(t, ps):
     return torch.cat((read_mem, t, write_mem), dim = -2)
 
 def frac_gradient(t, frac = 1.):
-    if frac == 1.:
-        return t
-
-    return t * frac + t.detach() * (1. - frac)
+    return t if frac == 1. else t * frac + t.detach() * (1. - frac)
 
 # rotary embedding
 
@@ -437,7 +431,7 @@ class RecurrentMemoryTransformerWrapper(nn.Module):
 
         # sample for the remaining length
 
-        for ind in range(length - start_len):
+        for _ in range(length - start_len):
             logits, next_memories, next_xl_memories = self.transformer(curr_segment, memories, xl_memories = xl_memories)
 
             logits = logits[:, -1]

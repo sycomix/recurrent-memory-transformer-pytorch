@@ -137,8 +137,4 @@ class Attend(nn.Module):
         attn = sim.softmax(dim=-1)
         attn = self.attn_dropout(attn)
 
-        # aggregate values
-
-        out = einsum("b h i j, b h j d -> b h i d", attn, v)
-
-        return out
+        return einsum("b h i j, b h j d -> b h i d", attn, v)
